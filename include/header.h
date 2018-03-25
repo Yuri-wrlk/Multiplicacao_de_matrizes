@@ -7,8 +7,10 @@
 #define _HEADER_
 
 #include <iostream>
+#include <cstdlib>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <stdexcept>
 #include <new>
 
