@@ -52,76 +52,51 @@ int main(int argc, const char *argv[]){
     string file_a, file_b;
     file_a = create_file_names('A', mat_dimension);
     file_b = create_file_names('B', mat_dimension);
-
-    ifstream file_mat_a(file_a, ifstream::in);
     vector<vector<double>> matrix_a(mat_dimension, vector<double>(mat_dimension,1));
-    if(!file_mat_a.eof()){
-        string line;
-        
-        getline(file_mat_a, line);
-
-        istringstream dim_line(line);
-
-        string aux_dim_line, aux_dim_col;
-        dim_line >> aux_dim_line;
-        dim_line >> aux_dim_col;
-
-        if (aux_dim_line == to_string(mat_dimension) && aux_dim_col == to_string(mat_dimension)){
-            getline(file_mat_a, line);
-            stringstream value_line(line);
-            string aux;
-            for(int i = 0; i < mat_dimension; i++){
-                for(int j = 0; j < mat_dimension; j++){
-                    value_line >> aux;
-
-                    matrix_a[i][j] = stod(aux);
-                }
-            }
-        }
-        else {
-            cout << ">>> Wrong file for Matrix " << 'A' << "opened, the dimensions " << aux_dim_line << "x" <<
-            aux_dim_col << " do not match with the arguments' dimensions: " << mat_dimension <<
-            "x" << mat_dimension << endl;
-            return EXIT_SUCCESS;  
-        }
-    }
-    file_mat_a.close();
-    
-    ifstream file_mat_b(file_b, ifstream::in);
     vector<vector<double>> matrix_b(mat_dimension, vector<double>(mat_dimension,1));
-    if(!file_mat_b.eof()){
-        string line;
+    for(int count = 0; count < 2; count++){
+        ifstream file_mat;
+        if(count == 0) file_mat.open(file_a, ifstream::in);
+        else if(count == 1) file_mat.open(file_b, ifstream::in);
         
-        getline(file_mat_b, line);
+        if(!file_mat.eof()){
+            string line;
+        
+            getline(file_mat, line);
 
-        istringstream dim_line(line);
+            istringstream dim_line(line);
 
-        string aux_dim_line, aux_dim_col;
-        dim_line >> aux_dim_line;
-        dim_line >> aux_dim_col;
+            string aux_dim_line, aux_dim_col;
+            dim_line >> aux_dim_line;
+            dim_line >> aux_dim_col;
 
-        if (aux_dim_line == to_string(mat_dimension) && aux_dim_col == to_string(mat_dimension)){
-            getline(file_mat_b, line);
-            stringstream value_line(line);
-            string aux;
-            for(int i = 0; i < mat_dimension; i++){
-                for(int j = 0; j < mat_dimension; j++){
-                    value_line >> aux;
-
-                    matrix_b[i][j] = stod(aux);
+            if (aux_dim_line == to_string(mat_dimension) && aux_dim_col == to_string(mat_dimension)){
+                string aux;
+                for(int i = 0; i < mat_dimension; i++){
+                    getline(file_mat, line);
+                    stringstream value_line(line);
+                    for(int j = 0; j < mat_dimension; j++){
+                        value_line >> aux;
+                        if(count == 0)
+                            matrix_a[i][j] = stod(aux);
+                        if(count == 1)
+                            matrix_b[i][j] = stod(aux);
+                    }
                 }
             }
+            else {
+                char mat_letter;
+                if (count == 0) mat_letter = 'A';
+                if (count == 1) mat_letter = 'B';
+                cout << ">>> Wrong file for Matrix " << mat_letter << " opened, the dimensions " << aux_dim_line << "x" <<
+                aux_dim_col << " do not match with the arguments' dimensions: " << mat_dimension <<
+                "x" << mat_dimension << endl;
+                return EXIT_SUCCESS;  
+            }
+            file_mat.close();
         }
-        else {
-            cout << ">>> Wrong file for Matrix " << 'B' << "opened, the dimensions " << aux_dim_line << "x" <<
-            aux_dim_col << " do not match with the arguments' dimensions: " << mat_dimension <<
-            "x" << mat_dimension << endl;
-            return EXIT_SUCCESS;  
-        }
-        file_mat_b.close();
     }
 
-    
-    
-    vector<vector<double>> mat_b(mat_dimension, vector<double>(mat_dimension,1));
+    cout << matrix_a[mat_dimension -1][mat_dimension -1] << endl;
+    cout << matrix_b[mat_dimension -1][mat_dimension -1] << endl;
 }
