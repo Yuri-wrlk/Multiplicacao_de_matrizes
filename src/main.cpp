@@ -107,6 +107,30 @@ vector<vector<double>> multiply_matrix_sequential (int mat_dim, vector<vector<do
     return matrix_c;
 }
 
+vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
+    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
+    
+    double aux = 0;
+    for(int i = 0; i < mat_dim; i++){
+        for(int j = 0; j < mat_dim; j++){
+            matrix_c[i][j] = 0;
+            aux = thread(concurrent_calculation, matrix_a, matrix_b, mat_dim, i, j);
+            matrix_c[i][j] = aux;
+            aux = 0;
+        }
+    }
+
+    return matrix_c;
+}
+
+int concurrent_calculation(vector<vector<double>> matrix_a, vector<vector<double>> matrix_b, int mat_dim, int i, int j){
+    int aux = 0;
+    for(int k = 0; k < mat_dim; k++){
+        aux += matrix_a[i][k] * matrix_b[k][j];
+    }
+    return aux;
+}
+
 int main(int argc, const char *argv[]){
     unsigned int mat_dimension;
     char run_mode;
