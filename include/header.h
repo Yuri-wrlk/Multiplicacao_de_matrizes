@@ -14,5 +14,6 @@
 #include <fstream>
 #include <stdexcept>
 #include <new>
+#include <math.h>
 
 #endif

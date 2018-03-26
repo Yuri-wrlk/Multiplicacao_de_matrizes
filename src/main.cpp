@@ -28,9 +28,9 @@ void print_error_message(){
     cout << "execution, respectivelly." << endl;
 }
 
-string create_file_names (char mat_letter, int mat_size){
+string create_file_names (char mat_letter, int mat_dim){
     stringstream stream_a;
-    stream_a << "data/" << string(1, mat_letter) << mat_size << "x" << mat_size << ".txt";
+    stream_a << "data/" << string(1, mat_letter) << mat_dim << "x" << mat_dim << ".txt";
     return stream_a.str();
 }
 
@@ -71,7 +71,41 @@ vector<vector<double>> create_matrix_from_files(string file_path, int mat_dimens
     return matrix;
 }
 
-//bool createfilenames (string &)
+void write_matrix_to_file (vector<vector<double>> matrix, char letter, int mat_dim){
+    stringstream stream_a;
+    stream_a << "data/" << string(1, letter) << mat_dim << "x" << mat_dim << ".txt";
+    string file_name = stream_a.str();
+    ofstream output_file;
+    output_file.open(file_name, ofstream::trunc);
+    output_file << mat_dim << " " << mat_dim << endl;
+
+    for(int i = 0; i < mat_dim; i++){
+        for(int j = 0; j < mat_dim; j++){
+            output_file << matrix[i][j];
+            if(j != mat_dim - 1) output_file << " ";
+        }
+        output_file << endl;
+    }
+    output_file.close();
+}
+
+vector<vector<double>> multiply_matrix_sequential (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
+    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
+    
+    double aux = 0;
+    for(int i = 0; i < mat_dim; i++){
+        for(int j = 0; j < mat_dim; j++){
+            matrix_c[i][j] = 0;
+                for(int k = 0; k < mat_dim; k++){
+                    aux += matrix_a[i][k] * matrix_b[k][j];
+                }
+            matrix_c[i][j] = aux;
+            aux = 0;
+        }
+    }
+
+    return matrix_c;
+}
 
 int main(int argc, const char *argv[]){
     unsigned int mat_dimension;
@@ -87,12 +121,17 @@ int main(int argc, const char *argv[]){
         return EXIT_SUCCESS;
     }
     string file_a, file_b;
+    
     file_a = create_file_names('A', mat_dimension);
     file_b = create_file_names('B', mat_dimension);
+    
     vector<vector<double>> matrix_a;
     vector<vector<double>> matrix_b;
+    vector<vector<double>> matrix_c;
 
     matrix_a = create_matrix_from_files(file_a, mat_dimension, 'A');
     matrix_b = create_matrix_from_files(file_b, mat_dimension, 'B');
-    
+    matrix_c = multiply_matrix_sequential(mat_dimension, matrix_a, matrix_b);
+
+    write_matrix_to_file(matrix_c, 'C', mat_dimension);
 }
