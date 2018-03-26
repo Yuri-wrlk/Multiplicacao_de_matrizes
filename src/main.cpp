@@ -30,7 +30,7 @@ void print_error_message(){
 
 string create_file_names (char mat_letter, int mat_size){
     stringstream stream_a;
-    stream_a << "../data/" << string(1, mat_letter) << mat_size << "x" << mat_size << ".txt";
+    stream_a << "data/" << string(1, mat_letter) << mat_size << "x" << mat_size << ".txt";
     return stream_a.str();
 }
 
@@ -53,4 +53,75 @@ int main(int argc, const char *argv[]){
     file_a = create_file_names('A', mat_dimension);
     file_b = create_file_names('B', mat_dimension);
 
+    ifstream file_mat_a(file_a, ifstream::in);
+    vector<vector<double>> matrix_a(mat_dimension, vector<double>(mat_dimension,1));
+    if(!file_mat_a.eof()){
+        string line;
+        
+        getline(file_mat_a, line);
+
+        istringstream dim_line(line);
+
+        string aux_dim_line, aux_dim_col;
+        dim_line >> aux_dim_line;
+        dim_line >> aux_dim_col;
+
+        if (aux_dim_line == to_string(mat_dimension) && aux_dim_col == to_string(mat_dimension)){
+            getline(file_mat_a, line);
+            stringstream value_line(line);
+            string aux;
+            for(int i = 0; i < mat_dimension; i++){
+                for(int j = 0; j < mat_dimension; j++){
+                    value_line >> aux;
+
+                    matrix_a[i][j] = stod(aux);
+                }
+            }
+        }
+        else {
+            cout << ">>> Wrong file for Matrix " << 'A' << "opened, the dimensions " << aux_dim_line << "x" <<
+            aux_dim_col << " do not match with the arguments' dimensions: " << mat_dimension <<
+            "x" << mat_dimension << endl;
+            return EXIT_SUCCESS;  
+        }
+    }
+    file_mat_a.close();
+    
+    ifstream file_mat_b(file_b, ifstream::in);
+    vector<vector<double>> matrix_b(mat_dimension, vector<double>(mat_dimension,1));
+    if(!file_mat_b.eof()){
+        string line;
+        
+        getline(file_mat_b, line);
+
+        istringstream dim_line(line);
+
+        string aux_dim_line, aux_dim_col;
+        dim_line >> aux_dim_line;
+        dim_line >> aux_dim_col;
+
+        if (aux_dim_line == to_string(mat_dimension) && aux_dim_col == to_string(mat_dimension)){
+            getline(file_mat_b, line);
+            stringstream value_line(line);
+            string aux;
+            for(int i = 0; i < mat_dimension; i++){
+                for(int j = 0; j < mat_dimension; j++){
+                    value_line >> aux;
+
+                    matrix_b[i][j] = stod(aux);
+                }
+            }
+        }
+        else {
+            cout << ">>> Wrong file for Matrix " << 'B' << "opened, the dimensions " << aux_dim_line << "x" <<
+            aux_dim_col << " do not match with the arguments' dimensions: " << mat_dimension <<
+            "x" << mat_dimension << endl;
+            return EXIT_SUCCESS;  
+        }
+        file_mat_b.close();
+    }
+
+    
+    
+    vector<vector<double>> mat_b(mat_dimension, vector<double>(mat_dimension,1));
 }
