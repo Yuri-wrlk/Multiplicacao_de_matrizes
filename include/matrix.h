@@ -2,9 +2,9 @@
  using namespace std;
  
 struct matrix {
-    vector<double> matrix_a;
-    vector<vector<double>> matrix_b;
-    double * val_c;
+    vector<int> matrix_a;
+    vector<vector<int>> matrix_b;
+    int * val_c;
     int mat_dim;
     int j;
 };

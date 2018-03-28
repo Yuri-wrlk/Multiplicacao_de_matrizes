@@ -34,11 +34,11 @@ string create_file_names (char mat_letter, int mat_dim){
     return stream_a.str();
 }
 
-vector<vector<double>> create_matrix_from_files(string file_path, int mat_dimension, char mat_letter){
+vector<vector<int>> create_matrix_from_files(string file_path, int mat_dimension, char mat_letter){
     
     ifstream file_mat;
     file_mat.open(file_path, ifstream::in);
-    vector<vector<double>> matrix(mat_dimension, vector<double>(mat_dimension,1));        
+    vector<vector<int>> matrix(mat_dimension, vector<int>(mat_dimension,1));        
     if(!file_mat.eof()){
         string line;
         getline(file_mat, line);
@@ -71,7 +71,7 @@ vector<vector<double>> create_matrix_from_files(string file_path, int mat_dimens
     return matrix;
 }
 
-void write_matrix_to_file (vector<vector<double>> matrix, char letter, int mat_dim){
+void write_matrix_to_file (vector<vector<int>> matrix, char letter, int mat_dim){
     stringstream stream_a;
     stream_a << "data/" << string(1, letter) << mat_dim << "x" << mat_dim << ".txt";
     string file_name = stream_a.str();
@@ -89,10 +89,10 @@ void write_matrix_to_file (vector<vector<double>> matrix, char letter, int mat_d
     output_file.close();
 }
 
-vector<vector<double>> multiply_matrix_sequential (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
-    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
+vector<vector<int>> multiply_matrix_sequential (int mat_dim, vector<vector<int>> matrix_a, vector<vector<int>> matrix_b){
+    vector<vector<int>> matrix_c(mat_dim, vector<int>(mat_dim,1));
     
-    double aux = 0;
+    int aux = 0;
     for(int i = 0; i < mat_dim; i++){
         for(int j = 0; j < mat_dim; j++){
             matrix_c[i][j] = 0;
@@ -110,18 +110,18 @@ vector<vector<double>> multiply_matrix_sequential (int mat_dim, vector<vector<do
 void * concurrent_calculation(void * arg){
     struct matrix * data;
     data = (struct matrix *) arg;
-    double aux = 0;
+    int aux = 0;
     for(int k = 0; k < data->mat_dim; k++){
         aux += data->matrix_a[k] * data->matrix_b[k][data->j];
     }
     *(data->val_c) = aux;
 }
 
-vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
+vector<vector<int>> multiply_matrix_concurrent (int mat_dim, vector<vector<int>> matrix_a, vector<vector<int>> matrix_b){
     vector<pthread_t> threads(mat_dim * mat_dim);
     struct matrix data[mat_dim * mat_dim];
-    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
-    double aux = 0;
+    vector<vector<int>> matrix_c(mat_dim, vector<int>(mat_dim,1));
+    int aux = 0;
     int result = 0;
     for(int i = 0; i < mat_dim; i++){
         for(int j = 0; j < mat_dim; j++){
@@ -140,7 +140,7 @@ vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<do
     }
 
     void * thread_result; 
-    double * value_pos;   
+    int * value_pos;   
     for(int i = 0; i < mat_dim; i++){
         for(int j = 0; j < mat_dim; j++){
             int pos = (i * mat_dim) + j;
@@ -149,7 +149,7 @@ vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<do
 				cout << ">>> Error: incapable of joining thread " << i << "x" << j << endl;
 			}
             
-            value_pos = ((double *)data[pos].val_c);
+            value_pos = ((int *)data[pos].val_c);
             matrix_c[i][j] = *value_pos;
         }
     }
@@ -176,9 +176,9 @@ int main(int argc, const char *argv[]){
     file_a = create_file_names('A', mat_dimension);
     file_b = create_file_names('B', mat_dimension);
     
-    vector<vector<double>> matrix_a;
-    vector<vector<double>> matrix_b;
-    vector<vector<double>> matrix_c;
+    vector<vector<int>> matrix_a;
+    vector<vector<int>> matrix_b;
+    vector<vector<int>> matrix_c;
 
     matrix_a = create_matrix_from_files(file_a, mat_dimension, 'A');
     matrix_b = create_matrix_from_files(file_b, mat_dimension, 'B');
