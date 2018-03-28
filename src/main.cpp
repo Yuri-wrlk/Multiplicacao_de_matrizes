@@ -114,9 +114,7 @@ void * concurrent_calculation(void * arg){
     for(int k = 0; k < data->mat_dim; k++){
         aux += data->matrix_a[k] * data->matrix_b[k][data->j];
     }
-    //cout << aux << endl;
-    data->val_c = (void *) (&aux);
-    //cout << *((double*)data->val_c) << endl;
+    *(data->val_c) = aux;
 }
 
 vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
@@ -130,7 +128,7 @@ vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<do
             int pos = (i * mat_dim) + j;
             data[pos].matrix_a = matrix_a[i];
             data[pos].matrix_b = matrix_b;
-            data[pos].val_c = new double;
+            data[pos].val_c = &(matrix_c[i][j]);
             data[pos].mat_dim = mat_dim;
             data[pos].j = j;
             matrix_c[i][j] = 0;
@@ -152,7 +150,6 @@ vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<do
 			}
             
             value_pos = ((double *)data[pos].val_c);
-            cout << *value_pos <<endl;
             matrix_c[i][j] = *value_pos;
         }
     }
