@@ -6,6 +6,7 @@
 #ifndef _HEADER_
 #define _HEADER_
 
+#include <pthread.h>
 #include <iostream>
 #include <cstdlib>
 #include <vector>
@@ -15,5 +16,6 @@
 #include <stdexcept>
 #include <new>
 #include <math.h>
-#include <thread>
+#include "matrix.h"
+
 #endif

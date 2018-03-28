@@ -79,8 +79,8 @@ void write_matrix_to_file (vector<vector<double>> matrix, char letter, int mat_d
     output_file.open(file_name, ofstream::trunc);
     output_file << mat_dim << " " << mat_dim << endl;
 
-    for(int i = 0; i < mat_dim; i++){
-        for(int j = 0; j < mat_dim; j++){
+    for(int i = 0; i < matrix.size(); i++){
+        for(int j = 0; j < matrix[0].size(); j++){
             output_file << matrix[i][j];
             if(j != mat_dim - 1) output_file << " ";
         }
@@ -107,29 +107,59 @@ vector<vector<double>> multiply_matrix_sequential (int mat_dim, vector<vector<do
     return matrix_c;
 }
 
-vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
-    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
-    
+void * concurrent_calculation(void * arg){
+    struct matrix * data;
+    data = (struct matrix *) arg;
     double aux = 0;
+    for(int k = 0; k < data->mat_dim; k++){
+        aux += data->matrix_a[k] * data->matrix_b[k][data->j];
+    }
+    //cout << aux << endl;
+    data->val_c = (void *) (&aux);
+    //cout << *((double*)data->val_c) << endl;
+}
+
+vector<vector<double>> multiply_matrix_concurrent (int mat_dim, vector<vector<double>> matrix_a, vector<vector<double>> matrix_b){
+    vector<pthread_t> threads(mat_dim * mat_dim);
+    struct matrix data[mat_dim * mat_dim];
+    vector<vector<double>> matrix_c(mat_dim, vector<double>(mat_dim,1));
+    double aux = 0;
+    int result = 0;
     for(int i = 0; i < mat_dim; i++){
         for(int j = 0; j < mat_dim; j++){
+            int pos = (i * mat_dim) + j;
+            data[pos].matrix_a = matrix_a[i];
+            data[pos].matrix_b = matrix_b;
+            data[pos].val_c = new double;
+            data[pos].mat_dim = mat_dim;
+            data[pos].j = j;
             matrix_c[i][j] = 0;
-            aux = thread(concurrent_calculation, matrix_a, matrix_b, mat_dim, i, j);
-            matrix_c[i][j] = aux;
-            aux = 0;
+            result = pthread_create(&(threads[pos]), NULL, concurrent_calculation, (void *)&(data[pos]));
+            if(result){
+                cout << ">>> Error: The thread of position " << i << "x" << j << "could not be created" << endl;
+            }
         }
     }
 
+    void * thread_result; 
+    double * value_pos;   
+    for(int i = 0; i < mat_dim; i++){
+        for(int j = 0; j < mat_dim; j++){
+            int pos = (i * mat_dim) + j;
+            result = pthread_join(threads[pos], &thread_result);
+			if (result) {
+				cout << ">>> Error: incapable of joining thread " << i << "x" << j << endl;
+			}
+            
+            value_pos = ((double *)data[pos].val_c);
+            cout << *value_pos <<endl;
+            matrix_c[i][j] = *value_pos;
+        }
+    }
     return matrix_c;
 }
 
-int concurrent_calculation(vector<vector<double>> matrix_a, vector<vector<double>> matrix_b, int mat_dim, int i, int j){
-    int aux = 0;
-    for(int k = 0; k < mat_dim; k++){
-        aux += matrix_a[i][k] * matrix_b[k][j];
-    }
-    return aux;
-}
+
 
 int main(int argc, const char *argv[]){
     unsigned int mat_dimension;
@@ -155,7 +185,7 @@ int main(int argc, const char *argv[]){
 
     matrix_a = create_matrix_from_files(file_a, mat_dimension, 'A');
     matrix_b = create_matrix_from_files(file_b, mat_dimension, 'B');
-    matrix_c = multiply_matrix_sequential(mat_dimension, matrix_a, matrix_b);
+    matrix_c = multiply_matrix_concurrent(mat_dimension, matrix_a, matrix_b);
 
     write_matrix_to_file(matrix_c, 'C', mat_dimension);
 }
