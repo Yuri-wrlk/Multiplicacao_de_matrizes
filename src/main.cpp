@@ -123,16 +123,18 @@ void * concurrent_calculation(void * arg){
     
     for(int i = 0; i < NUMTHREADS; i++){
         pthread_create(&thread_id[i], NULL, thread_function, NULL);
+        thread_id[i].join();
+        struct matrix * data;
+        data = (struct matrix *) arg;
+        vector<unsigned long int> * matrix_a;
+        matrix_a = data->matrix_a;
+        vector<vector<unsigned long int>> * matrix_b;
+        matrix_b = data->matrix_b;
     }
     /*for(int j = 0; j < NUMTHREADS; j++){
         pthread_join(thread_id[j], NULL);
     }*/
-    struct matrix * data;
-    data = (struct matrix *) arg;
-    vector<unsigned long int> * matrix_a;
-    matrix_a = data->matrix_a;
-    vector<vector<unsigned long int>> * matrix_b;
-    matrix_b = data->matrix_b;
+
     int aux = 0;
     
     for(int k = 0; k < data->mat_dim; k++){
