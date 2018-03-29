@@ -1,6 +1,6 @@
 ############################# Makefile ##########################
 CC = g++
-CFLAGS = -W -Wall -ansi
+CFLAGS = -W -std=c+11 -lpthread
 SRC= $(wildcard *.cpp)
 EXEC = main
 OBJ = $(SRC:.cpp = .o)
@@ -8,7 +8,7 @@ OBJ = $(SRC:.cpp = .o)
 all: $(EXEC)
 
 main: main.o
-	$(CC) -std=c++0x -o main.cpp main $(CFLAGS)
+	$(CC) -o main.cpp main $(CFLAGS)
 clean:
 	rm -rf *.o
 mrproper: clean

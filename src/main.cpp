@@ -1,6 +1,17 @@
 #include "header.h"
 
+#define NUMTHREADS  2 
+
 using namespace std;
+
+phtread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+
+void *thread_function(void *dummyPtr){
+    printf("Thread number %ld\n", pthread_self());
+    pthread_mutex_lock( &mutex1 );
+    counter++;
+    pthread_mutex_unlock( &mutex1 );
+}
 
 bool is_power_of2(unsigned int x) {
    return x && !(x & (x - 1));
@@ -18,8 +29,8 @@ bool check_valid_arguments(unsigned int mat_dimension, char run_mode){
     }
     return flag;
 }
-
 void print_error_message(){
+
     cout << ">>> Not enough arguments passed" << endl;
     cout << ">>> You should execute the program as ./multimat [number] [mode]" << endl;
     cout << ">>> [number] should be an integer that is 2 to the power of an integer";
@@ -108,6 +119,14 @@ vector<vector<unsigned long int>> multiply_matrix_sequential (int mat_dim, vecto
 }
 
 void * concurrent_calculation(void * arg){
+    pthread_t thread_id[NUMTHREADS];
+    
+    for(int i = 0; i < NUMTHREADS; i++){
+        pthread_create(&thread_id[i], NULL, thread_function, NULL);
+    }
+    /*for(int j = 0; j < NUMTHREADS; j++){
+        pthread_join(thread_id[j], NULL);
+    }*/
     struct matrix * data;
     data = (struct matrix *) arg;
     vector<unsigned long int> * matrix_a;
@@ -119,8 +138,8 @@ void * concurrent_calculation(void * arg){
     for(int k = 0; k < data->mat_dim; k++){
         aux += matrix_a->at(k) * (matrix_b->at(k)).at(data->j);
     }
-    //cout << "A thread da posição " << data->i << "x" << data->j <<" encerrou com valor " << aux << endl;
     *(data->val_c) = aux;
+    //cout << "A thread da posição " << data->i << "x" << data->j <<" encerrou com valor " << aux << endl;
 }
 
 vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vector<vector<unsigned long int>> matrix_a, vector<vector<unsigned long int>> matrix_b){
