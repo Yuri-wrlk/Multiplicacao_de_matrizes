@@ -146,7 +146,6 @@ void * concurrent_calculation(void * arg){
 
 vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vector<vector<unsigned long int>> matrix_a, vector<vector<unsigned long int>> matrix_b){
     vector<pthread_t> threads(((unsigned long int)(mat_dim * mat_dim)));
-    threads.join();
     struct matrix * data = new struct matrix[(unsigned long int)(mat_dim * mat_dim)];
     vector<vector<unsigned long int>> matrix_c(mat_dim, vector<unsigned long int>(mat_dim,1));
     unsigned long int aux = 0;
@@ -161,14 +160,14 @@ vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vecto
             data[pos].j = j;
             data[pos].i = i;
             matrix_c[i][j] = 0;
-            result = threads.join(&(threads[pos]), NULL, concurrent_calculation, (void *)&(data[pos]));
-            if(result){
-                cout << ">>> Error: The thread of position " << i << "x" << j << "could not be created" << endl;
-
-            }
         }
     }
 
+    result = threads.join(&(threads[pos]), NULL, concurrent_calculation, (void *)&(data[pos]));
+        if(result){
+            cout << ">>> Error: The thread of position " << i << "x" << j << "could not be created" << endl;
+        }
+    
     void * thread_result; 
     int * value_pos;   
     for(int i = 0; i < mat_dim; i++){
@@ -185,8 +184,6 @@ vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vecto
     }
     return matrix_c;
 }
-
-
 
 int main(int argc, const char *argv[]){
     unsigned int mat_dimension;
