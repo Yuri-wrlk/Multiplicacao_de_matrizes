@@ -88,7 +88,7 @@ def write_matrix_to_file(matrix):
     file_output.close()
 
 def write_result_to_file(exec_type, mat_line, mat_col, mean_time):
-    file_path = "data/Result" + mat_line + "x" + mat_col + '.csv'
+    file_path = "data/Results.csv'
     file_output = open(file_path, "a")
     file_output.write(str(exec_type) + ", " + str(mat_line) + ", " + str(mat_col) + ", "+ str(mean_time) + "\n")
 
