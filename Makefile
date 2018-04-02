@@ -1,6 +1,6 @@
 ############################# Makefile ##########################
 CC = g++
-CFLAGS = -W -std=c+11 -lpthread
+CFLAGS = -W -std=c++11 -lpthread 
 SRC= $(wildcard *.cpp)
 EXEC = main
 OBJ = $(SRC:.cpp = .o)
@@ -13,3 +13,6 @@ clean:
 	rm -rf *.o
 mrproper: clean
 	rm -rf $(EXEC)
+
+
+## g++ -std=c++11 -I include/ src/main.cpp -o bin/multimat

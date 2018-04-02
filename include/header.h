@@ -18,4 +18,8 @@
 #include <math.h>
 #include "matrix.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
 #endif

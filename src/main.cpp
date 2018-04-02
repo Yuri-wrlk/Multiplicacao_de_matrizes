@@ -1,10 +1,11 @@
 #include "header.h"
 
-#define NUMTHREADS  2 
+//#define NUMTHREADS  2 
+#define tTotal 1000
 
 using namespace std;
 
-phtread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
+/*phtread_mutex_t mutex1 = PTHREAD_MUTEX_INITIALIZER;
 
 void *thread_function(void *dummyPtr){
     printf("Thread number %ld\n", pthread_self());
@@ -12,7 +13,7 @@ void *thread_function(void *dummyPtr){
     counter++;
     pthread_mutex_unlock( &mutex1 );
 }
-
+*/
 bool is_power_of2(unsigned int x) {
    return x && !(x & (x - 1));
  }
@@ -118,7 +119,7 @@ vector<vector<unsigned long int>> multiply_matrix_sequential (int mat_dim, vecto
     return matrix_c;
 }
 
-void * concurrent_calculation(void * arg){
+/*void * concurrent_calculation(void * arg){
     pthread_t thread_id[NUMTHREADS];
     
     for(int i = 0; i < NUMTHREADS; i++){
@@ -131,9 +132,6 @@ void * concurrent_calculation(void * arg){
         vector<vector<unsigned long int>> * matrix_b;
         matrix_b = data->matrix_b;
     }
-    /*for(int j = 0; j < NUMTHREADS; j++){
-        pthread_join(thread_id[j], NULL);
-    }*/
 
     int aux = 0;
     
@@ -141,7 +139,7 @@ void * concurrent_calculation(void * arg){
         aux += matrix_a->at(k) * (matrix_b->at(k)).at(data->j);
     }
     *(data->val_c) = aux;
-    cout << "A thread da posição " << data->i << "x" << data->j <<" encerrou com valor " << aux << endl;
+    //cout << "A thread da posição " << data->i << "x" << data->j <<" encerrou com valor " << aux << endl;
 }
 
 vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vector<vector<unsigned long int>> matrix_a, vector<vector<unsigned long int>> matrix_b){
@@ -184,10 +182,14 @@ vector<vector<unsigned long int>> multiply_matrix_concurrent (int mat_dim, vecto
     }
     return matrix_c;
 }
-
+*/
 int main(int argc, const char *argv[]){
     unsigned int mat_dimension;
     char run_mode;
+    int numExecs = 0;
+    int t1 = clock();
+    int limite = t1 + tTotal;
+
     if(argc >= 3){
         mat_dimension = strtoul(argv[1], NULL, 10);
         run_mode = *argv[2];
@@ -198,6 +200,7 @@ int main(int argc, const char *argv[]){
         print_error_message();
         return EXIT_SUCCESS;
     }
+
     string file_a, file_b;
     file_a = create_file_names('A', mat_dimension);
     file_b = create_file_names('B', mat_dimension);
@@ -207,7 +210,13 @@ int main(int argc, const char *argv[]){
     vector<vector<unsigned long int>> matrix_c;
     matrix_a = create_matrix_from_files(file_a, mat_dimension, 'A');
     matrix_b = create_matrix_from_files(file_b, mat_dimension, 'B');
-    matrix_c = multiply_matrix_concurrent(mat_dimension, matrix_a, matrix_b);
 
+    while ( clock() < limite ) {
+        matrix_c = multiply_matrix_sequential(mat_dimension, matrix_a, matrix_b);
+        numExecs++;
+    }
+    int t2 = clock();
     write_matrix_to_file(matrix_c, 'C', mat_dimension);
+    cout <<  ((t2-t1) / (numExecs*1000));
+    //matrix_c = multiply_matrix_concurrent(mat_dimension, matrix_a, matrix_b);
 }
