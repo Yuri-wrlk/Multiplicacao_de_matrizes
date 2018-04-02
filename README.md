@@ -1,5 +1,4 @@
 # Multiplicação de Matrizes
-=================
 
 Esse projeto tem como principal objetivo, por meio da análise estatística da média dos valores de tempos de execução dos algoritmos, verificar se é válido ou não o senso comum de que programas concorrentes apresentam um melhor desempenho com relação ao tempo de execução quando comparado a suas respectivas versões sequenciais. 
 
